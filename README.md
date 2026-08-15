@@ -1,0 +1,31 @@
+# UED: свой teacher для JaxUED-лабиринтов
+
+Тестовое задание T-LAB, Open-Ended Learning. Условие — [NOTES.md](NOTES.md),
+конвенции репозитория — [AGENTS.md](AGENTS.md).
+
+## Setup
+
+```bash
+./setup.sh
+source .venv/bin/activate
+```
+
+На GPU-машине jax ставится отдельно: `pip install "jax[cuda12]==0.4.30"`.
+
+## Baselines
+
+```bash
+export WANDB_MODE=offline
+python baseline.py --method dr    --seed 0
+python baseline.py --method plr   --seed 0
+python baseline.py --method accel --seed 0
+```
+
+Чекпойнты — `checkpoints/<method>/<seed>/`, полный прогон ≈ час на A100.
+
+## Eval
+
+```bash
+python baseline.py --method accel --seed 0 --mode eval
+python solve_rate.py results/dr results/plr results/accel --plot
+```
