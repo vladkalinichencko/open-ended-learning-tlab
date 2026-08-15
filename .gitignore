@@ -28,3 +28,8 @@ ext/*
 # артефакты jaxued (чекпойнты сдаём отдельно архивом)
 checkpoints/
 results/
+
+# mlflow (локальный трекинг)
+mlflow.db
+mlruns/
+mlartifacts/

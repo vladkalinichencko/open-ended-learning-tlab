@@ -13,4 +13,5 @@ pillow
 imageio
 matplotlib
 # jaxued: pip install --no-deps -e ext/jaxued
-moviepy
+moviepy<2   # wandb 0.17.5 зовёт moviepy.editor, в 2.x его нет
+mlflow

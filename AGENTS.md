@@ -10,6 +10,7 @@
 | `NOTES.md` | задание, сетап, лог, идеи, результаты | да |
 | `baseline.py` | запуск DR / PLR$^\perp$ / ACCEL с нетронутым конфигом student'а | да |
 | `solve_rate.py` | агрегация `results/` в таблицу solve rate по сидам | да |
+| `wandb_shim/` | подменный `wandb`, пишет в локальный MLflow (jaxued зашит на wandb) | да |
 | `maze_ours.py` | наш teacher (копия `maze_plr.py` с правками teacher-стороны) | да |
 | `report.md` | финальный отчёт | да |
 | `checkpoints/` | чекпойнты обучения, `<run_name>/<seed>/models/` | нет |
@@ -32,18 +33,26 @@
   свой, в `datasets/`, с описанием в отчёте.
 - Сравнения только на полном бюджете и минимум на 3 сидах: на коротких прогонах
   порядок методов другой.
-- Всё черновое — в `tmp/`.
+- **Граница кода.** Корень — код человека: `baseline.py`, `solve_rate.py`, финальный
+  `maze_ours.py`. `tmp/` — территория агента: варианты teacher'а, одноразовые скрипты,
+  логи, разборы. Там можно что угодно, но по-человечески читаемо.
+- Из `tmp/` в корень переезжает только то, что доказало пользу, — причёсанным и со
+  строкой в NOTES → «Лог».
 - Каждый прогон — строка в NOTES → «Лог».
 
 ## Команды
 
 ```bash
 source .venv/bin/activate
-export WANDB_MODE=offline          # или wandb login
 python baseline.py --method accel --seed 0
 python baseline.py --method accel --seed 0 --mode eval
 python solve_rate.py results/dr results/plr results/accel --plot
+mlflow ui --backend-store-uri sqlite:///mlflow.db     # метрики, картинки уровней, гифки
 ```
+
+Логирование: `wandb` не используется. `baseline.py` подставляет `wandb_shim/` первым в
+`PYTHONPATH`, поэтому upstream-код jaxued пишет в MLflow, не подозревая об этом.
+Свой `maze_ours.py` — копия upstream, так что достаточно запускать его тем же лаунчером.
 
 ## Что сдаём
 

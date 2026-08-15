@@ -15,11 +15,13 @@ source .venv/bin/activate
 ## Baselines
 
 ```bash
-export WANDB_MODE=offline
 python baseline.py --method dr    --seed 0
 python baseline.py --method plr   --seed 0
 python baseline.py --method accel --seed 0
 ```
+
+Метрики пишутся в локальный MLflow (`sqlite:///mlflow.db`) через `wandb_shim/` —
+wandb не нужен. Смотреть: `mlflow ui --backend-store-uri sqlite:///mlflow.db`.
 
 Чекпойнты — `checkpoints/<method>/<seed>/`, полный прогон ≈ час на A100.
 
