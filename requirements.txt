@@ -13,3 +13,4 @@ pillow
 imageio
 matplotlib
 # jaxued: pip install --no-deps -e ext/jaxued
+moviepy

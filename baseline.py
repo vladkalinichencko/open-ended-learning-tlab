@@ -26,8 +26,7 @@ def main():
     p.add_argument("--mode", choices=["train", "eval"], default="train")
     p.add_argument("--project", default="tlab-ued")
     p.add_argument("--run-name", default=None)
-    p.add_argument("rest", nargs="*", help="extra flags forwarded upstream (teacher side only)")
-    args = p.parse_args()
+    args, rest = p.parse_known_args()  # rest goes upstream verbatim (teacher side only)
 
     run_name = args.run_name or args.method
     cmd = [sys.executable, str(JAXUED / SCRIPT[args.method]),
@@ -40,7 +39,7 @@ def main():
                 "--checkpoint_directory", f"checkpoints/{run_name}/{args.seed}",
                 "--checkpoint_to_eval", "-1"]
 
-    cmd += args.rest
+    cmd += rest
     print(" ".join(cmd))
     sys.exit(subprocess.call(cmd, cwd=ROOT))
 
