@@ -21,8 +21,9 @@ ROOT = pathlib.Path(__file__).parent.resolve()
 JAXUED = ROOT / "ext" / "jaxued"
 SHIM = ROOT / "wandb_shim"
 
-SCRIPT = {"dr": "examples/maze_dr.py", "plr": "examples/maze_plr.py", "accel": "examples/maze_plr.py"}
-FLAGS = {"dr": [], "plr": [], "accel": ["--use_accel"]}
+SCRIPT = {"dr": "examples/maze_dr.py", "plr": "examples/maze_plr.py", "accel": "examples/maze_plr.py",
+          "mine": None}  # mine — teacher.py в корне: копия maze_plr со своими score
+FLAGS = {"dr": [], "plr": [], "accel": ["--use_accel"], "mine": ["--use_accel"]}
 
 
 def main():
@@ -35,7 +36,8 @@ def main():
     args, rest = p.parse_known_args()  # rest goes upstream verbatim (teacher side only)
 
     run_name = args.run_name or args.method
-    cmd = [sys.executable, str(JAXUED / SCRIPT[args.method]),
+    script = ROOT / "teacher.py" if SCRIPT[args.method] is None else JAXUED / SCRIPT[args.method]
+    cmd = [sys.executable, str(script),
            "--seed", str(args.seed), "--run_name", run_name, "--project", args.project]
 
     if args.mode == "train":
