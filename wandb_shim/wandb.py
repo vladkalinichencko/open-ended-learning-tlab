@@ -52,6 +52,9 @@ def define_metric(*args, **kwargs):
 
 def init(config=None, project=None, group=None, tags=None, **kwargs):
     globals()["config"] = _Config(config or {})
+    # maze_plr передаёт в group имя прогона, а maze_dr — склейку всех гиперпараметров,
+    # и прогон DR оказывался в MLflow под нечитаемой строкой. Имя берём из конфига.
+    group = (config or {}).get("run_name") or group
     # файловый бэкенд в свежем mlflow в maintenance mode, поэтому локальный sqlite
     mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db"))
     mlflow.set_experiment(project or "jaxued")
