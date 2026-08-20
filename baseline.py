@@ -22,8 +22,13 @@ JAXUED = ROOT / "ext" / "jaxued"
 SHIM = ROOT / "wandb_shim"
 
 SCRIPT = {"dr": "examples/maze_dr.py", "plr": "examples/maze_plr.py", "accel": "examples/maze_plr.py",
-          "mine": None}  # mine — teacher.py в корне: копия maze_plr со своими score
-FLAGS = {"dr": [], "plr": [], "accel": ["--use_accel"], "mine": ["--use_accel"]}
+          "mine": None, "sfl": None}  # свои: teacher.py и sfl.py в корне
+FLAGS = {"dr": [], "plr": [], "accel": ["--use_accel"], "mine": ["--use_accel"],
+         # SFL: равномерный выбор из топ-K, без слагаемого устаревания, половина батча
+         # свежая случайная — семантика буфера из статьи, а не приоритезация PLR
+         "sfl": ["--prioritization", "topk", "--topk_k", "1000",
+                 "--staleness_coeff", "0.0", "--replay_prob", "0.5",
+                 "--level_buffer_capacity", "4000", "--minimum_fill_ratio", "0.0"]}
 
 
 def main():
@@ -36,7 +41,7 @@ def main():
     args, rest = p.parse_known_args()  # rest goes upstream verbatim (teacher side only)
 
     run_name = args.run_name or args.method
-    script = ROOT / "teacher.py" if SCRIPT[args.method] is None else JAXUED / SCRIPT[args.method]
+    script = ROOT / f"{ {'mine': 'teacher', 'sfl': 'sfl'}[args.method] }.py" if SCRIPT[args.method] is None else JAXUED / SCRIPT[args.method]
     cmd = [sys.executable, str(script),
            "--seed", str(args.seed), "--run_name", run_name, "--project", args.project]
 
