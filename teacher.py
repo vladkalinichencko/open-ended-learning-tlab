@@ -400,7 +400,15 @@ def junction_count(wall_map):
     return jnp.sum(jnp.logical_and(degree >= 3, is_open), axis=(1, 2))
 
 
-def compute_score(config, dones, values, max_returns, advantages, rewards=None, levels=None):
+def success_rate(dones, rewards):
+    """Доля эпизодов на уровне, закончившихся достижением цели."""
+    solved, _, episodes = accumulate_rollout_stats(dones, (rewards > 0).astype(jnp.float32),
+                                                   time_average=False)
+    return jnp.where(episodes > 0, solved, 0.0)
+
+
+def compute_score(config, dones, values, max_returns, advantages, rewards=None, levels=None,
+                  prior_p=None):
     """Копия upstream плюс свои score-функции. Всё, что выше по файлу, не тронуто.
 
     learnability: p(1-p) по доле решённых эпизодов на уровне. Максимум на p=0.5, то
@@ -417,9 +425,13 @@ def compute_score(config, dones, values, max_returns, advantages, rewards=None, 
     elif name == "pvl":
         return positive_value_loss(dones, advantages)
     elif name in ("learnability", "learnability_pvl", "learnability_struct"):
-        solved, _, episodes = accumulate_rollout_stats(dones, (rewards > 0).astype(jnp.float32),
-                                                       time_average=False)
-        p = jnp.where(episodes > 0, solved, 0.0)
+        p = success_rate(dones, rewards)
+        if prior_p is not None:
+            # p с одного захода почти всегда 0 или 1, а p(1-p) на двоичной величине
+            # тождественно ноль — измерено, см. NOTES. Копим долю по всем визитам.
+            p = jnp.where(prior_p < 0, p, (1 - config["p_decay"]) * prior_p
+                          + config["p_decay"] * p)
+        episodes = jnp.ones_like(p)
         score = p * (1 - p)
         if name == "learnability_pvl":
             score = score * jnp.maximum(positive_value_loss(dones, advantages), 0.0)
@@ -533,7 +545,7 @@ def main(config=None, project="JAXUED_TEST"):
             # optax.adam(learning_rate=config["lr"], eps=1e-5),
         )
         pholder_level = sample_random_level(jax.random.PRNGKey(0))
-        sampler = level_sampler.initialize(pholder_level, {"max_return": -jnp.inf})
+        sampler = level_sampler.initialize(pholder_level, {"max_return": -jnp.inf, "p_ema": 0.0})
         pholder_level_batch = jax.tree_util.tree_map(lambda x: jnp.array([x]).repeat(config["num_train_envs"], axis=0), pholder_level)
         return TrainState.create(
             apply_fn=network.apply,
@@ -581,8 +593,11 @@ def main(config=None, project="JAXUED_TEST"):
             )
             advantages, targets = compute_gae(config["gamma"], config["gae_lambda"], last_value, values, rewards, dones)
             max_returns = compute_max_returns(dones, rewards)
-            scores = compute_score(config, dones, values, max_returns, advantages, rewards, new_levels)
-            sampler, _ = level_sampler.insert_batch(sampler, new_levels, scores, {"max_return": max_returns})
+            p_now = success_rate(dones, rewards)
+            scores = compute_score(config, dones, values, max_returns, advantages, rewards,
+                                   new_levels, -jnp.ones_like(p_now))
+            sampler, _ = level_sampler.insert_batch(sampler, new_levels, scores,
+                                                    {"max_return": max_returns, "p_ema": p_now})
             
             # Update: train_state only modified if exploratory_grad_updates is on
             (rng, train_state), losses = update_actor_critic_rnn(
@@ -640,8 +655,12 @@ def main(config=None, project="JAXUED_TEST"):
             advantages, targets = compute_gae(config["gamma"], config["gae_lambda"], last_value, values, rewards, dones)
             max_returns = jnp.maximum(level_sampler.get_levels_extra(sampler, level_inds)["max_return"], compute_max_returns(dones, rewards))
             levels = level_sampler.get_levels(sampler, level_inds)
-            scores = compute_score(config, dones, values, max_returns, advantages, rewards, levels)
-            sampler = level_sampler.update_batch(sampler, level_inds, scores, {"max_return": max_returns})
+            prior_p = level_sampler.get_levels_extra(sampler, level_inds)["p_ema"]
+            scores = compute_score(config, dones, values, max_returns, advantages, rewards,
+                                   levels, prior_p)
+            p_now = (1 - config["p_decay"]) * prior_p + config["p_decay"] * success_rate(dones, rewards)
+            sampler = level_sampler.update_batch(sampler, level_inds, scores,
+                                                 {"max_return": max_returns, "p_ema": p_now})
             
             # Update the policy using trajectories collected from replay levels
             (rng, train_state), losses = update_actor_critic_rnn(
@@ -702,8 +721,11 @@ def main(config=None, project="JAXUED_TEST"):
             )
             advantages, targets = compute_gae(config["gamma"], config["gae_lambda"], last_value, values, rewards, dones)
             max_returns = compute_max_returns(dones, rewards)
-            scores = compute_score(config, dones, values, max_returns, advantages, rewards, child_levels)
-            sampler, _ = level_sampler.insert_batch(sampler, child_levels, scores, {"max_return": max_returns})
+            p_now = success_rate(dones, rewards)
+            scores = compute_score(config, dones, values, max_returns, advantages, rewards,
+                                   child_levels, -jnp.ones_like(p_now))
+            sampler, _ = level_sampler.insert_batch(sampler, child_levels, scores,
+                                                    {"max_return": max_returns, "p_ema": p_now})
             
             # Update: train_state only modified if exploratory_grad_updates is on
             (rng, train_state), losses = update_actor_critic_rnn(
@@ -913,6 +935,8 @@ if __name__=="__main__":
     group.add_argument("--score_function", type=str, default="MaxMC",
                        choices=["MaxMC", "pvl", "learnability", "learnability_pvl",
                                 "learnability_struct"])
+    group.add_argument("--p_decay", type=float, default=0.3,
+                       help="скорость забывания доли успехов по визитам уровня")
     group.add_argument("--struct_tau", type=float, default=20.0,
                        help="во сколько развилок обесценивается уровень вдвое-с-небольшим")
     group.add_argument("--exploratory_grad_updates", action=argparse.BooleanOptionalAction, default=False)
