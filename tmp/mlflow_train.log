@@ -1,0 +1,8 @@
+2026/08/16 00:18:23 INFO mlflow.store.db.utils: Creating initial MLflow database tables...
+2026/08/16 00:18:23 INFO mlflow.store.db.utils: Updating database tables
+2026/08/16 00:18:24 INFO mlflow.tracking.fluent: Experiment with name 'tlab-ued' does not exist. Creating a new experiment.
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 1
+Logging update: 2
+/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/.venv/bin/python /Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/ext/jaxued/examples/maze_plr.py --seed 0 --run_name smoke --project tlab-ued --use_accel --checkpoint_save_interval 17 --num_updates 2 --eval_freq 1 --eval_num_attempts 1 --checkpoint_save_interval 1

@@ -1,0 +1,25 @@
+wandb: Tracking run with wandb version 0.17.5
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+Logging update: 1
+wandb: ERROR wandb.Video requires moviepy and imageio when passing raw data.  Install with "pip install moviepy imageio"
+Traceback (most recent call last):
+  File "/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/tmp/maze_debug.py", line 904, in <module>
+    main(config, project=config["project"])
+  File "/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/tmp/maze_debug.py", line 825, in main
+    log_eval(metrics, train_state_to_log_dict(runner_state[1], level_sampler))
+  File "/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/tmp/maze_debug.py", line 451, in log_eval
+    log_dict.update({f"animations/{level_name}": wandb.Video(frames, fps=4)})
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/.venv/lib/python3.12/site-packages/wandb/sdk/data_types/video.py", line 128, in __init__
+    self.encode()
+  File "/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/.venv/lib/python3.12/site-packages/wandb/sdk/data_types/video.py", line 131, in encode
+    mpy = util.get_module(
+          ^^^^^^^^^^^^^^^^
+  File "/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/.venv/lib/python3.12/site-packages/wandb/util.py", line 279, in get_module
+    raise wandb.Error(required)
+wandb.errors.Error: wandb.Video requires moviepy and imageio when passing raw data.  Install with "pip install moviepy imageio"
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/wandb/offline-run-20260816_000746-mprezfir
+wandb: Find logs at: ./wandb/offline-run-20260816_000746-mprezfir/logs
+wandb: WARNING The new W&B backend becomes opt-out in version 0.18.0; try it out with `wandb.require("core")`! See https://wandb.me/wandb-core for more information.

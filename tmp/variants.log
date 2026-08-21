@@ -1,0 +1,12 @@
+=== base:  ===
+  exit=0
+=== pvl: --score_function pvl ===
+  exit=0
+=== replay50: --replay_prob 0.5 ===
+  exit=0
+=== temp01: --temperature 0.1 ===
+  exit=0
+=== edits15: --num_edits 15 ===
+  exit=0
+=== buf500: --level_buffer_capacity 500 ===
+  exit=0

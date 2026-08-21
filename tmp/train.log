@@ -1,0 +1,69 @@
+wandb: Tracking run with wandb version 0.17.5
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 1
+Logging update: 2
+wandb: 
+wandb: Run history:
+wandb:        eval_ep_lengths/mean ▁▁
+wandb: level_sampler/episode_count ▁█
+wandb:     level_sampler/max_score ▁▁
+wandb:    level_sampler/mean_score █▁
+wandb:          level_sampler/size ▁█
+wandb:               num_env_steps ▁█
+wandb:                 num_updates ▁█
+wandb:            return/Labyrinth ▁▁
+wandb:           return/Labyrinth2 ▁▁
+wandb:     return/LabyrinthFlipped ▁▁
+wandb:         return/SixteenRooms ▁▁
+wandb:        return/SixteenRooms2 ▁▁
+wandb:         return/StandardMaze ▁▁
+wandb:        return/StandardMaze2 ▁▁
+wandb:        return/StandardMaze3 ▁▁
+wandb:                 return/mean ▁▁
+wandb:        solve_rate/Labyrinth ▁▁
+wandb:       solve_rate/Labyrinth2 ▁▁
+wandb: solve_rate/LabyrinthFlipped ▁▁
+wandb:     solve_rate/SixteenRooms ▁▁
+wandb:    solve_rate/SixteenRooms2 ▁▁
+wandb:     solve_rate/StandardMaze ▁▁
+wandb:    solve_rate/StandardMaze2 ▁▁
+wandb:    solve_rate/StandardMaze3 ▁▁
+wandb:             solve_rate/mean ▁▁
+wandb:                         sps ▁█
+wandb: 
+wandb: Run summary:
+wandb:        eval_ep_lengths/mean 250.0
+wandb: level_sampler/episode_count 64
+wandb:     level_sampler/max_score 0.83247
+wandb:    level_sampler/mean_score 0.0594
+wandb:          level_sampler/size 64
+wandb:               num_env_steps 16384
+wandb:                 num_updates 2
+wandb:            return/Labyrinth 0.0
+wandb:           return/Labyrinth2 0.0
+wandb:     return/LabyrinthFlipped 0.0
+wandb:         return/SixteenRooms 0.0
+wandb:        return/SixteenRooms2 0.0
+wandb:         return/StandardMaze 0.0
+wandb:        return/StandardMaze2 0.0
+wandb:        return/StandardMaze3 0.0
+wandb:                 return/mean 0.0
+wandb:        solve_rate/Labyrinth 0.0
+wandb:       solve_rate/Labyrinth2 0.0
+wandb: solve_rate/LabyrinthFlipped 0.0
+wandb:     solve_rate/SixteenRooms 0.0
+wandb:    solve_rate/SixteenRooms2 0.0
+wandb:     solve_rate/StandardMaze 0.0
+wandb:    solve_rate/StandardMaze2 0.0
+wandb:    solve_rate/StandardMaze3 0.0
+wandb:             solve_rate/mean 0.0
+wandb:                         sps 1040.34436
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/wandb/offline-run-20260816_000926-3695b3ps
+wandb: Find logs at: ./wandb/offline-run-20260816_000926-3695b3ps/logs
+wandb: WARNING The new W&B backend becomes opt-out in version 0.18.0; try it out with `wandb.require("core")`! See https://wandb.me/wandb-core for more information.
+/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/.venv/bin/python /Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/ext/jaxued/examples/maze_plr.py --seed 0 --run_name smoke --project tlab-ued --use_accel --checkpoint_save_interval 17 --num_updates 2 --eval_freq 1 --eval_num_attempts 1 --checkpoint_save_interval 1
