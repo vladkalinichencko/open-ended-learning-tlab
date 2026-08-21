@@ -33,3 +33,6 @@ results/
 mlflow.db
 mlruns/
 mlartifacts/
+
+# логи прогонов, на которые ссылаются заметки — в git
+!logs/

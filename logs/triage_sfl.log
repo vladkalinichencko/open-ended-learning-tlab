@@ -1,0 +1,31 @@
+/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/.venv/bin/python /Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/sfl.py --seed 0 --run_name triage_sfl --project tlab-ued --prioritization topk --topk_k 1000 --staleness_coeff 0.0 --replay_prob 0.5 --level_buffer_capacity 4000 --minimum_fill_ratio 0.0 --checkpoint_save_interval 17 --num_updates 2500 --eval_freq 250 --eval_num_attempts 30 --checkpoint_save_interval 1 --sfl_num_levels 512 --sfl_attempts 8 --sfl_period 250
+поиск: решаемых 0.410, обучаемых 0.410, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 250
+поиск: решаемых 0.854, обучаемых 0.850, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 500
+поиск: решаемых 0.883, обучаемых 0.873, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 750
+поиск: решаемых 0.938, обучаемых 0.641, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 1000
+поиск: решаемых 0.984, обучаемых 0.377, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 1250
+поиск: решаемых 0.979, обучаемых 0.270, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 1500
+поиск: решаемых 0.992, обучаемых 0.258, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 1750
+поиск: решаемых 0.975, обучаемых 0.203, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 2000
+поиск: решаемых 0.984, обучаемых 0.217, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 2250
+поиск: решаемых 0.990, обучаемых 0.166, лучший p(1-p) 0.250
+WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
+Logging update: 2500

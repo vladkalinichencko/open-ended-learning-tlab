@@ -1,0 +1,1 @@
+/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/.venv/bin/python /Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/ext/jaxued/examples/maze_plr.py --seed 0 --run_name full_accel_s0 --project tlab-ued --mode eval --checkpoint_directory checkpoints/full_accel_s0/0 --checkpoint_to_eval -1 --eval_num_attempts 50
