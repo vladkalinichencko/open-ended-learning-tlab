@@ -59,3 +59,10 @@ runs/**/*.npz
 
 # автоматизация и wiring-проверки: проверяющим не нужны
 tmp/
+
+# автоматизация прогонов и локальные заглушки: проверяющим не нужны
+run_short.sh
+run_triage.sh
+run_teacher_variants.sh
+build_explainer.py
+wandb_shim/

@@ -18,6 +18,9 @@ from jaxued.linen import ResetRNN
 from jaxued.environments import Maze, MazeRenderer
 from jaxued.environments.maze import Level, make_level_generator, make_level_mutator_minimax
 from jaxued.level_sampler import LevelSampler
+
+import scores
+from teacher_stats import success_rate
 from jaxued.utils import accumulate_rollout_stats, compute_max_returns, max_mc, positive_value_loss
 from jaxued.wrappers import AutoReplayWrapper
 import chex
@@ -386,44 +389,13 @@ def train_state_to_log_dict(train_state: TrainState, level_sampler: LevelSampler
         }
     }
 
-def success_rate(dones, rewards):
-    """Доля эпизодов на уровне, закончившихся достижением цели."""
-    solved, _, episodes = accumulate_rollout_stats(dones, (rewards > 0).astype(jnp.float32),
-                                                   time_average=False)
-    return jnp.where(episodes > 0, solved, 0.0)
 
 
 def compute_score(config, dones, values, max_returns, advantages, rewards=None,
                   prior_p=None):
-    """Копия upstream плюс свои score-функции. Всё, что выше по файлу, не тронуто.
+    return scores.SCORES[config["score_function"]](
+        config, dones, values, max_returns, advantages, rewards, prior_p)
 
-    learnability: p(1-p) по доле решённых эпизодов на уровне. Максимум на p=0.5, то
-    есть на границе способностей студента, а не на самых сложных уровнях — прямой
-    ответ на то, чем плохи прокси regret'а (см. NOTES: MaxMC коррелирует с длиной
-    пути -0.45, то есть меряет сложность).
-
-    learnability_pvl: то же, помноженное на положительную ошибку предсказания. Уровень
-    должен быть и на границе, и давать сигнал обучения.
-    """
-    name = config['score_function']
-    if name == "MaxMC":
-        return max_mc(dones, values, max_returns)
-    elif name == "pvl":
-        return positive_value_loss(dones, advantages)
-    elif name in ("learnability", "learnability_pvl"):
-        p = success_rate(dones, rewards)
-        if prior_p is not None:
-            # p с одного захода почти всегда 0 или 1, а p(1-p) на двоичной величине
-            # тождественно ноль — измерено, см. NOTES. Копим долю по всем визитам.
-            p = jnp.where(prior_p < 0, p, (1 - config["p_decay"]) * prior_p
-                          + config["p_decay"] * p)
-        episodes = jnp.ones_like(p)
-        score = p * (1 - p)
-        if name == "learnability_pvl":
-            score = score * jnp.maximum(positive_value_loss(dones, advantages), 0.0)
-        return jnp.where(episodes > 0, score, -jnp.inf)
-    else:
-        raise ValueError(f"Unknown score function: {name}")
 
 def main(config=None, project="JAXUED_TEST"):
     tags = []
