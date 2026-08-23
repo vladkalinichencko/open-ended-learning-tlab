@@ -1,0 +1,291 @@
+{
+  "run": "accel_maxmc_a100_triage_seed0",
+  "seed": 0,
+  "attempts": 5,
+  "levels": [
+    "SixteenRooms",
+    "SixteenRooms2",
+    "Labyrinth",
+    "LabyrinthFlipped",
+    "Labyrinth2",
+    "StandardMaze",
+    "StandardMaze2",
+    "StandardMaze3"
+  ],
+  "normal": {
+    "SixteenRooms": {
+      "solve_rate": 0.8,
+      "returns": [
+        0.0,
+        0.16119995713233948,
+        0.30159997940063477,
+        0.4383999705314636,
+        0.6363999843597412
+      ],
+      "episode_lengths": [
+        250,
+        233,
+        194,
+        156,
+        101
+      ]
+    },
+    "SixteenRooms2": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "Labyrinth": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "LabyrinthFlipped": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "Labyrinth2": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "StandardMaze": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "StandardMaze2": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "StandardMaze3": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    }
+  },
+  "zero_memory": {
+    "SixteenRooms": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "SixteenRooms2": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "Labyrinth": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "LabyrinthFlipped": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "Labyrinth2": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "StandardMaze": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "StandardMaze2": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    },
+    "StandardMaze3": {
+      "solve_rate": 0.0,
+      "returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "episode_lengths": [
+        250,
+        250,
+        250,
+        250,
+        250
+      ]
+    }
+  }
+}

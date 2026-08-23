@@ -1,3 +1,0 @@
-/Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/.venv/bin/python /Users/vladislavkalinichenko/VSCodeProjects/T-Lab Contests/open-ended-learning/ext/jaxued/examples/maze_plr.py --seed 0 --run_name accel --project tlab-ued --use_accel --checkpoint_save_interval 17
-WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.
-WARNING:absl:SaveArgs.aggregate is deprecated, please use custom TypeHandler (https://orbax.readthedocs.io/en/latest/custom_handlers.html#typehandler) or contact Orbax team to migrate before May 1st, 2024.

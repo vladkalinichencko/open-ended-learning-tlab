@@ -386,20 +386,6 @@ def train_state_to_log_dict(train_state: TrainState, level_sampler: LevelSampler
         }
     }
 
-def junction_count(wall_map):
-    """Сколько на уровне клеток с тремя и более открытыми соседями.
-
-    Диагностика dev-набора дала это как сильнейший разделитель: студент решает уровни
-    с 42 развилками в среднем и проваливает с 2.6. Развилка — это место, где он
-    получает выбор и обратную связь; коридор без развилок он идёт вслепую. Считается
-    четырьмя сдвигами, то есть внутри jit почти бесплатно.
-    """
-    is_open = jnp.logical_not(wall_map)
-    pad = jnp.pad(is_open, ((0, 0), (1, 1), (1, 1))).astype(jnp.int32)
-    degree = (pad[:, :-2, 1:-1] + pad[:, 2:, 1:-1] + pad[:, 1:-1, :-2] + pad[:, 1:-1, 2:])
-    return jnp.sum(jnp.logical_and(degree >= 3, is_open), axis=(1, 2))
-
-
 def success_rate(dones, rewards):
     """Доля эпизодов на уровне, закончившихся достижением цели."""
     solved, _, episodes = accumulate_rollout_stats(dones, (rewards > 0).astype(jnp.float32),
@@ -407,7 +393,7 @@ def success_rate(dones, rewards):
     return jnp.where(episodes > 0, solved, 0.0)
 
 
-def compute_score(config, dones, values, max_returns, advantages, rewards=None, levels=None,
+def compute_score(config, dones, values, max_returns, advantages, rewards=None,
                   prior_p=None):
     """Копия upstream плюс свои score-функции. Всё, что выше по файлу, не тронуто.
 
@@ -424,7 +410,7 @@ def compute_score(config, dones, values, max_returns, advantages, rewards=None, 
         return max_mc(dones, values, max_returns)
     elif name == "pvl":
         return positive_value_loss(dones, advantages)
-    elif name in ("learnability", "learnability_pvl", "learnability_struct"):
+    elif name in ("learnability", "learnability_pvl"):
         p = success_rate(dones, rewards)
         if prior_p is not None:
             # p с одного захода почти всегда 0 или 1, а p(1-p) на двоичной величине
@@ -435,10 +421,6 @@ def compute_score(config, dones, values, max_returns, advantages, rewards=None, 
         score = p * (1 - p)
         if name == "learnability_pvl":
             score = score * jnp.maximum(positive_value_loss(dones, advantages), 0.0)
-        elif name == "learnability_struct":
-            # ось, по которой студент проваливается: чем меньше развилок, тем дороже
-            # уровень. Умножаем, а не складываем, чтобы нерешаемое всё равно не всплывало
-            score = score * jnp.exp(-junction_count(levels.wall_map) / config["struct_tau"])
         return jnp.where(episodes > 0, score, -jnp.inf)
     else:
         raise ValueError(f"Unknown score function: {name}")
@@ -595,7 +577,7 @@ def main(config=None, project="JAXUED_TEST"):
             max_returns = compute_max_returns(dones, rewards)
             p_now = success_rate(dones, rewards)
             scores = compute_score(config, dones, values, max_returns, advantages, rewards,
-                                   new_levels, -jnp.ones_like(p_now))
+                                   -jnp.ones_like(p_now))
             sampler, _ = level_sampler.insert_batch(sampler, new_levels, scores,
                                                     {"max_return": max_returns, "p_ema": p_now})
             
@@ -654,10 +636,9 @@ def main(config=None, project="JAXUED_TEST"):
             )
             advantages, targets = compute_gae(config["gamma"], config["gae_lambda"], last_value, values, rewards, dones)
             max_returns = jnp.maximum(level_sampler.get_levels_extra(sampler, level_inds)["max_return"], compute_max_returns(dones, rewards))
-            levels = level_sampler.get_levels(sampler, level_inds)
             prior_p = level_sampler.get_levels_extra(sampler, level_inds)["p_ema"]
             scores = compute_score(config, dones, values, max_returns, advantages, rewards,
-                                   levels, prior_p)
+                                   prior_p)
             p_now = (1 - config["p_decay"]) * prior_p + config["p_decay"] * success_rate(dones, rewards)
             sampler = level_sampler.update_batch(sampler, level_inds, scores,
                                                  {"max_return": max_returns, "p_ema": p_now})
@@ -723,7 +704,7 @@ def main(config=None, project="JAXUED_TEST"):
             max_returns = compute_max_returns(dones, rewards)
             p_now = success_rate(dones, rewards)
             scores = compute_score(config, dones, values, max_returns, advantages, rewards,
-                                   child_levels, -jnp.ones_like(p_now))
+                                   -jnp.ones_like(p_now))
             sampler, _ = level_sampler.insert_batch(sampler, child_levels, scores,
                                                     {"max_return": max_returns, "p_ema": p_now})
             
@@ -933,12 +914,9 @@ if __name__=="__main__":
     group.add_argument("--critic_coeff", type=float, default=0.5)
     # === PLR ===
     group.add_argument("--score_function", type=str, default="MaxMC",
-                       choices=["MaxMC", "pvl", "learnability", "learnability_pvl",
-                                "learnability_struct"])
+                       choices=["MaxMC", "pvl", "learnability", "learnability_pvl"])
     group.add_argument("--p_decay", type=float, default=0.3,
                        help="скорость забывания доли успехов по визитам уровня")
-    group.add_argument("--struct_tau", type=float, default=20.0,
-                       help="во сколько развилок обесценивается уровень вдвое-с-небольшим")
     group.add_argument("--exploratory_grad_updates", action=argparse.BooleanOptionalAction, default=False)
     group.add_argument("--level_buffer_capacity", type=int, default=4000)
     group.add_argument("--replay_prob", type=float, default=0.8)

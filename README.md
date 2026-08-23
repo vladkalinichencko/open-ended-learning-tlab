@@ -31,3 +31,11 @@ wandb не нужен. Смотреть: `mlflow ui --backend-store-uri sqlite:/
 python baseline.py --method accel --seed 0 --mode eval
 python solve_rate.py results/dr results/plr results/accel --plot
 ```
+
+Черновые методы из `tmp/oel` сохраняют только policy. Перед штатным JaxUED eval
+экспортируйте её в ожидаемую структуру:
+
+```bash
+python export_checkpoint.py runs/<run> checkpoints/<run>/<seed>
+python baseline.py --method accel --run-name <run> --seed <seed> --mode eval
+```

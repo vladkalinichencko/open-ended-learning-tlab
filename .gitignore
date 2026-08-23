@@ -38,3 +38,24 @@ mlruns/
 mlartifacts/
 
 # logs/, results/, runs/ и tmp/ содержат доказательства и отслеживаются
+
+# служебные инструкции агентов
+AGENTS.md
+CLAUDE.md
+
+# сырые дампы роллаутов: DIAGNOSTICS.html self-contained, агрегаты вшиты внутрь
+runs/**/rollout.json
+runs/**/heldout_rollouts.npz
+
+# чекпойнты не идут в git целиком, кроме требуемых заданием
+!checkpoints/
+checkpoints/*
+!checkpoints/submission/
+
+# веса внутри runs: они дублируют checkpoints/submission
+runs/**/*.msgpack
+runs/**/checkpoints/
+runs/**/*.npz
+
+# автоматизация и wiring-проверки: проверяющим не нужны
+tmp/

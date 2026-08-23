@@ -12,6 +12,9 @@ wandb==0.17.5
 pillow
 imageio
 matplotlib
+scipy
 # jaxued: pip install --no-deps -e ext/jaxued
 moviepy<2   # wandb 0.17.5 зовёт moviepy.editor, в 2.x его нет
 mlflow
+torch==2.13.0
+torchvision==0.28.0
