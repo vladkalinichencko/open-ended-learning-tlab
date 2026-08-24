@@ -1,6 +1,6 @@
 # Teacher-side curricula для zero-shot переноса в лабиринтах
 
-Тестовое задание T-LAB, направление open-ended learning. Условие — в [NOTES.md](NOTES.md),
+Тестовое задание T-LAB, направление open-ended learning. 
 отчёт — в [REPORT.md](REPORT.md).
 
 ## Результаты
@@ -38,7 +38,6 @@ pip install -r requirements.txt
 python -m oel.training            # обучение student с выбранным teacher-score
 python -m oel.evaluate_heldout    # оценка на человеческих held-out картах
 python -m oel.summary_report      # -> DIAGNOSTICS.html
-python make_figures.py            # рисунок отчёта
 python export_checkpoint.py       # экспорт политики в layout JaxUED
 ```
 

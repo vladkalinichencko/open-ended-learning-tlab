@@ -154,7 +154,6 @@ pip install -r requirements.txt
 python -m oel.training            # обучение студента с выбранным счётом
 python -m oel.evaluate_heldout    # оценка на человеческих отложенных картах
 python -m oel.summary_report      # -> DIAGNOSTICS.html
-python make_figures.py            # рисунок отчёта
 ```
 
 Счёт обучаемости лежит в `scores/learnability.py`, сам предиктор и остальные варианты — в `oel/methods.py`, конфигурации прогонов — в `oel/config.py`. Чекпойнты выбранного метода и собственного прогона ACCEL лежат в `checkpoints/submission/` в родном формате JaxUED, архитектура политики не менялась. Вся диагностика — в [DIAGNOSTICS.html](DIAGNOSTICS.html).

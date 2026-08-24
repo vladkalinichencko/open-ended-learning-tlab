@@ -68,3 +68,7 @@ build_explainer.py
 wandb_shim/
 setup.sh
 run_full.sh
+
+# журнал работы и вспомогательные скрипты: проверяющему не нужны
+NOTES.md
+tmp/
