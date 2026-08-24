@@ -66,3 +66,5 @@ run_triage.sh
 run_teacher_variants.sh
 build_explainer.py
 wandb_shim/
+setup.sh
+run_full.sh

@@ -158,10 +158,10 @@ DEGen [arXiv:2601.14957](https://arxiv.org/pdf/2601.14957).
 
 | эксперимент | код | статус | запуск | результат | диагностика |
 |---|---|---|---|---|---|
-| 1. DR baseline | [baseline.py](baseline.py) | частичный | 8000 / 30 000, seed 0, [лог](logs/full_dr_s0.log) | solve 0.288 на update 8000 | [ранний HTML](runs/report.html) |
-| 2. Robust PLR с MaxMC | [baseline.py](baseline.py) | частичный | 10 500 / 30 000, seed 0, [лог](logs/full_plr_s0.log) | solve 0.383 на update 10 500 | [ранний HTML](runs/report.html) |
-| 3. ACCEL с MaxMC | [baseline.py](baseline.py) | полный бюджет, один seed | 30 000 updates, seed 0, команда из README; [train](logs/full_accel_s0.log), [eval](logs/accel_eval.log) | train-final 0.300; сохранённый checkpoint 0.320. По уровням: SixteenRooms 0.86, SixteenRooms2 0.16, Labyrinth 0.82, LabyrinthFlipped 0.24, Labyrinth2 0.48, StandardMaze/2/3 0.00 | [ранний HTML](runs/report.html), [eval-массивы](results/full_accel_s0/0/results.npz) |
-| ACCEL с MaxMC, контроль общего training path | [tmp/oel](tmp/oel) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve 0.361 на update 500 | [JSON и HTML](runs/accel_maxmc_mac_seed0/report.html) |
+| 1. DR baseline | [baseline.py](baseline.py) | частичный | 8000 / 30 000, seed 0, [лог](logs/full_dr_s0.log) | solve 0.288 на update 8000 | [ранний HTML](DIAGNOSTICS.html) |
+| 2. Robust PLR с MaxMC | [baseline.py](baseline.py) | частичный | 10 500 / 30 000, seed 0, [лог](logs/full_plr_s0.log) | solve 0.383 на update 10 500 | [ранний HTML](DIAGNOSTICS.html) |
+| 3. ACCEL с MaxMC | [baseline.py](baseline.py) | полный бюджет, один seed | 30 000 updates, seed 0, команда из README; [train](logs/full_accel_s0.log), [eval](logs/accel_eval.log) | train-final 0.300; сохранённый checkpoint 0.320. По уровням: SixteenRooms 0.86, SixteenRooms2 0.16, Labyrinth 0.82, LabyrinthFlipped 0.24, Labyrinth2 0.48, StandardMaze/2/3 0.00 | [ранний HTML](DIAGNOSTICS.html), [eval-массивы](results/full_accel_s0/0/results.npz) |
+| ACCEL с MaxMC, контроль общего training path | [tmp/oel](tmp/oel) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve 0.361 на update 500 | [JSON и HTML](DIAGNOSTICS.html) |
 | 4. ACCEL с MaxMC и buffer 500 | [run_teacher_variants.sh](run_teacher_variants.sh) | короткий прогон завершён | 2500 updates, seed 0, [лог](tmp/var_buf500.log) | solve 0.128 | — |
 | 5. ACCEL с MaxMC и replay probability 0.5 | [run_teacher_variants.sh](run_teacher_variants.sh) | короткий прогон завершён | 2500 updates, seed 0, [лог](tmp/var_replay50.log) | solve 0.101 | — |
 | 6. ACCEL с MaxMC и temperature 0.1 | [run_teacher_variants.sh](run_teacher_variants.sh) | короткий прогон завершён | 2500 updates, seed 0, [лог](tmp/var_temp01.log) | solve 0.041 | — |
@@ -169,13 +169,13 @@ DEGen [arXiv:2601.14957](https://arxiv.org/pdf/2601.14957).
 | 8. ACCEL с PVL | [run_teacher_variants.sh](run_teacher_variants.sh) | короткий прогон завершён | 2500 updates, seed 0, [лог](tmp/var_pvl.log) | solve 0.037 | — |
 | 9. ACCEL с learnability-score | [teacher.py](teacher.py) | короткий прогон завершён | 2500 updates, seed 0, [лог](logs/triage_learnability.log) | solve 0.029 против 0.175 у ACCEL с MaxMC на том же update | [buffer](logs/buffer_learnability.json) |
 | 10. SFL-like search с learnability-score и последующим MaxMC replay | [sfl.py](sfl.py) | некорректная проверка SFL | 2500 updates, seed 0, [лог](logs/triage_sfl.log) | — | [buffer](logs/buffer_sfl.json) |
-| 11. SFL по Algorithms 1–2: \(N=128\), \(K=64\), \(T=50\), \(\rho=0.5\), 5 эпизодов на уровень | [tmp/oel](tmp/oel) | предварительный Mac | 500 updates, 4.096 млн training + 1.6 млн search interactions, seed 0 | validation solve 0.392 на update 500 | [JSON и HTML](runs/sfl_mac_seed0/report.html) |
-| 13. ACCEL с предиктором успеха по фиксированным признакам конфигурации лабиринта | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve: final 0.305, peak 0.345 | [JSON и HTML](runs/accel_fixed_predictor_mac_seed0/report.html) |
-| 14. ACCEL с CNN-предиктором успеха по карте уровня | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve: final и peak 0.280 | [JSON и HTML](runs/accel_cnn_predictor_mac_seed0/report.html) |
-| 15. ACCEL с замороженным предобученным ResNet-18 и обучаемым предиктором успеха | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0; ResNet на CPU | validation solve: final 0.325, peak 0.336 | [JSON и HTML](runs/accel_resnet_predictor_mac_seed0/report.html) |
-| 16. ACCEL со score TRACED: PVL + ошибка предсказания следующего наблюдения | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve: final и peak 0.325 | [JSON и HTML](runs/accel_traced_mac_seed0/report.html) |
-| 17. ACCEL со score TRACED: PVL + ошибка предсказания следующего наблюдения + co-learnability | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve: final 0.303, peak 0.367 | [JSON и HTML](runs/accel_traced_colearn_mac_seed0/report.html) |
-| 18. A100-отсев: ACCEL с MaxMC, ACCEL с фиксированными признаками, ACCEL с CNN и SFL | [tmp/oel](tmp/oel) | завершён, один seed | 5000 updates, seed 0; пять попыток на каждом held-out уровне | validation: 0.994 / 0.942 / 0.952 / 0.975; held-out mean: 0.100 / 0.150 / 0.375 / 0.125 | [динамика](runs/a100_clearml/a100_comparison_seed0.html), [held-out](runs/a100_clearml/heldout_seed0_5k/heldout_comparison.html), JSON, rollout NPZ и checkpoints |
+| 11. SFL по Algorithms 1–2: \(N=128\), \(K=64\), \(T=50\), \(\rho=0.5\), 5 эпизодов на уровень | [tmp/oel](tmp/oel) | предварительный Mac | 500 updates, 4.096 млн training + 1.6 млн search interactions, seed 0 | validation solve 0.392 на update 500 | [JSON и HTML](DIAGNOSTICS.html) |
+| 13. ACCEL с предиктором успеха по фиксированным признакам конфигурации лабиринта | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve: final 0.305, peak 0.345 | [JSON и HTML](DIAGNOSTICS.html) |
+| 14. ACCEL с CNN-предиктором успеха по карте уровня | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve: final и peak 0.280 | [JSON и HTML](DIAGNOSTICS.html) |
+| 15. ACCEL с замороженным предобученным ResNet-18 и обучаемым предиктором успеха | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0; ResNet на CPU | validation solve: final 0.325, peak 0.336 | [JSON и HTML](DIAGNOSTICS.html) |
+| 16. ACCEL со score TRACED: PVL + ошибка предсказания следующего наблюдения | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve: final и peak 0.325 | [JSON и HTML](DIAGNOSTICS.html) |
+| 17. ACCEL со score TRACED: PVL + ошибка предсказания следующего наблюдения + co-learnability | [methods.py](tmp/oel/methods.py) | предварительный Mac | 500 updates, 4.096 млн interactions, seed 0 | validation solve: final 0.303, peak 0.367 | [JSON и HTML](DIAGNOSTICS.html) |
+| 18. A100-отсев: ACCEL с MaxMC, ACCEL с фиксированными признаками, ACCEL с CNN и SFL | [tmp/oel](tmp/oel) | завершён, один seed | 5000 updates, seed 0; пять попыток на каждом held-out уровне | validation: 0.994 / 0.942 / 0.952 / 0.975; held-out mean: 0.100 / 0.150 / 0.375 / 0.125 | [динамика](DIAGNOSTICS.html), [held-out](DIAGNOSTICS.html), JSON, rollout NPZ и checkpoints |
 
 ### Почему SFL устроен сложнее, чем формула \(p(1-p)\)
 
@@ -215,15 +215,15 @@ DEGen [arXiv:2601.14957](https://arxiv.org/pdf/2601.14957).
 
 - [DIAGNOSTICS.html](DIAGNOSTICS.html): единый отчёт по механике методов, A100-обучению,
   held-out уровням, zero-memory ablation и failure-context hierarchy.
-- [runs/ued_explainer.html](runs/ued_explainer.html): цикл UED, уровни buffer и replay.
-- [runs/report.html](runs/report.html): ранняя динамика DR, PLR и ACCEL.
-- [runs/mac_comparison_seed0.html](runs/mac_comparison_seed0.html): общая динамика семи
+- [DIAGNOSTICS.html](DIAGNOSTICS.html): цикл UED, уровни buffer и replay.
+- [DIAGNOSTICS.html](DIAGNOSTICS.html): ранняя динамика DR, PLR и ACCEL.
+- [DIAGNOSTICS.html](DIAGNOSTICS.html): общая динамика семи
   предварительных методов на одном validation-наборе.
-- [runs/a100_clearml/a100_comparison_seed0.html](runs/a100_clearml/a100_comparison_seed0.html):
+- [DIAGNOSTICS.html](DIAGNOSTICS.html):
   A100-динамика четырёх методов на одном validation-наборе.
-- [runs/a100_clearml/heldout_seed0_5k/heldout_comparison.html](runs/a100_clearml/heldout_seed0_5k/heldout_comparison.html):
+- [DIAGNOSTICS.html](DIAGNOSTICS.html):
   пять попыток на каждом held-out уровне; рядом лежат JSON и полные rollout NPZ.
-- [runs/a100_clearml/heldout_seed0_5k/accel_maxmc_failure_hierarchy/report.html](runs/a100_clearml/heldout_seed0_5k/accel_maxmc_failure_hierarchy/report.html):
+- [DIAGNOSTICS.html](DIAGNOSTICS.html):
   деревья transition-embedding для окон 10–80 кадров с шагом 10, без разрезания на кластеры.
 - Фиксированные признаки: сохранять семь признаков из [levels.py](levels.py), карты и
   результаты student; показывать диапазоны признаков и разные карты с одинаковыми или

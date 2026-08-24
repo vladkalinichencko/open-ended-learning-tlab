@@ -1,4 +1,4 @@
-"""Export a tmp/oel policy in the checkpoint layout expected by JaxUED eval."""
+"""Export an oel policy in the checkpoint layout expected by JaxUED eval."""
 
 import argparse
 import json
@@ -15,7 +15,7 @@ from jaxued.environments import Maze
 from jaxued.environments.maze import make_level_generator
 from jaxued.wrappers import AutoReplayWrapper
 
-from tmp.oel.training import create_student
+from oel.training import create_student
 
 
 def export_checkpoint(run_dir: Path, destination: Path) -> None:
