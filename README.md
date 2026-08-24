@@ -22,7 +22,7 @@ python export_checkpoint.py      # экспорт политики в форма
 |---|---|
 | MaxMC, приближение сожаления | `scores/maxmc.py` |
 | ошибка предсказания ценности | `scores/pvl.py` |
-| обучаемость \(q(1-q)\) | `scores/learnability.py` |
+| обучаемость $q(1-q)$ | `scores/learnability.py` |
 | предикторы: признаки, свёртка, ResNet | `oel/methods.py` |
 | обучение ученика и цикл учителя | `oel/training.py` |
 | оценка на отложенных картах | `oel/evaluate_heldout.py` |
