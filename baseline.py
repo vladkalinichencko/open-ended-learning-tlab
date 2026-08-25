@@ -30,7 +30,6 @@ FLAGS = {"dr": [], "plr": [], "accel": ["--use_accel"], "mine": ["--use_accel"],
                  "--staleness_coeff", "0.0", "--replay_prob", "0.5",
                  "--level_buffer_capacity", "4000", "--minimum_fill_ratio", "0.0"]}
 
-
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--method", choices=SCRIPT, required=True)
@@ -56,9 +55,10 @@ def main():
     print(" ".join(cmd))
 
     env = dict(os.environ)
-    env["PYTHONPATH"] = os.pathsep.join([str(SHIM), env.get("PYTHONPATH", "")]).rstrip(os.pathsep)
+    jaxued = [str(JAXUED / "src"), str(JAXUED / "examples")]
+    env["PYTHONPATH"] = os.pathsep.join(
+        [str(SHIM), *jaxued, env.get("PYTHONPATH", "")]).rstrip(os.pathsep)
     sys.exit(subprocess.call(cmd, cwd=ROOT, env=env))
-
 
 if __name__ == "__main__":
     main()

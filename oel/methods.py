@@ -6,18 +6,19 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
+import torch
+import torch.nn.functional as functional
 from flax import linen as nn
 from flax.training.train_state import TrainState
+from torchvision.models import ResNet18_Weights, resnet18
 
 import levels as maze_features
-
 
 class FeaturePredictor(nn.Module):
     @nn.compact
     def __call__(self, x):
         x = nn.relu(nn.Dense(32)(x))
         return nn.Dense(1)(x).squeeze(-1)
-
 
 class GridPredictor(nn.Module):
     @nn.compact
@@ -27,7 +28,6 @@ class GridPredictor(nn.Module):
         x = x.reshape((x.shape[0], -1))
         x = nn.relu(nn.Dense(32)(x))
         return nn.Dense(1)(x).squeeze(-1)
-
 
 class TransitionPredictor(nn.Module):
     @nn.compact
@@ -43,7 +43,6 @@ class TransitionPredictor(nn.Module):
         x = nn.relu(nn.ConvTranspose(32, (3, 3), padding="SAME")(x))
         x = nn.sigmoid(nn.ConvTranspose(3, (3, 3), padding="SAME")(x))
         return x.reshape((time, batch, 5, 5, 3))
-
 
 def fixed_features(level_batch) -> jnp.ndarray:
     rows = []
@@ -67,13 +66,11 @@ def fixed_features(level_batch) -> jnp.ndarray:
         ])
     return jnp.asarray(rows, dtype=jnp.float32)
 
-
 def grid_features(level_batch) -> jnp.ndarray:
     walls = jnp.asarray(level_batch.wall_map, dtype=jnp.float32)
     starts = jax.nn.one_hot(level_batch.agent_pos[:, 1] * 13 + level_batch.agent_pos[:, 0], 169)
     goals = jax.nn.one_hot(level_batch.goal_pos[:, 1] * 13 + level_batch.goal_pos[:, 0], 169)
     return jnp.stack((walls, starts.reshape(-1, 13, 13), goals.reshape(-1, 13, 13)), axis=-1)
-
 
 def create_predictor(kind: str, seed: int, learning_rate: float) -> tuple[TrainState, Callable]:
     if kind == "fixed":
@@ -86,7 +83,6 @@ def create_predictor(kind: str, seed: int, learning_rate: float) -> tuple[TrainS
     state = TrainState.create(apply_fn=model.apply, params=params, tx=optax.adam(learning_rate))
     return state, encode
 
-
 @jax.jit
 def update_predictor(state: TrainState, x: jnp.ndarray, success: jnp.ndarray):
     def loss(params):
@@ -96,11 +92,9 @@ def update_predictor(state: TrainState, x: jnp.ndarray, success: jnp.ndarray):
     value, gradients = jax.value_and_grad(loss)(state.params)
     return state.apply_gradients(grads=gradients), value
 
-
 @jax.jit
 def predict_success(state: TrainState, x: jnp.ndarray) -> jnp.ndarray:
     return jax.nn.sigmoid(state.apply_fn(state.params, x))
-
 
 def create_transition_predictor(seed: int) -> TrainState:
     model = TransitionPredictor()
@@ -111,7 +105,6 @@ def create_transition_predictor(seed: int) -> TrainState:
     )
     optimizer = optax.chain(optax.clip_by_global_norm(0.5), optax.adamw(1e-4, weight_decay=1e-5))
     return TrainState.create(apply_fn=model.apply, params=params, tx=optimizer)
-
 
 @jax.jit
 def update_transition_predictor(state: TrainState, observations, actions):
@@ -125,19 +118,14 @@ def update_transition_predictor(state: TrainState, observations, actions):
     (value, (per_level, predictions)), gradients = jax.value_and_grad(loss, has_aux=True)(state.params)
     return state.apply_gradients(grads=gradients), value, per_level, predictions, targets
 
-
 @jax.jit
 def predict_transitions(state: TrainState, observations, actions):
     return state.apply_fn(state.params, observations.image[:-1], actions[:-1])
-
 
 class ResNetPredictor:
     """Замороженный ImageNet ResNet-18 и одна обучаемая голова."""
 
     def __init__(self, seed: int, learning_rate: float):
-        import torch
-        from torchvision.models import ResNet18_Weights, resnet18
-
         self.torch = torch
         torch.manual_seed(seed)
         self.device = torch.device(
@@ -155,8 +143,6 @@ class ResNetPredictor:
         self.std = torch.tensor((0.229, 0.224, 0.225), device=self.device)[None, :, None, None]
 
     def predict_and_update(self, level_batch, success) -> tuple[jnp.ndarray, float]:
-        import torch.nn.functional as functional
-
         images = np.asarray(grid_features(level_batch)).transpose(0, 3, 1, 2).copy()
         images = self.torch.as_tensor(images, dtype=self.torch.float32, device=self.device)
         images = functional.interpolate(images, size=(224, 224), mode="nearest")

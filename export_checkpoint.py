@@ -17,7 +17,6 @@ from jaxued.wrappers import AutoReplayWrapper
 
 from oel.training import create_student
 
-
 def export_checkpoint(run_dir: Path, destination: Path) -> None:
     if destination.exists():
         raise FileExistsError(destination)
@@ -57,7 +56,6 @@ def export_checkpoint(run_dir: Path, destination: Path) -> None:
         raise ValueError("Orbax restore changed the parameter tree")
 
     print(destination)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -19,9 +19,7 @@ from jaxued.wrappers import AutoReplayWrapper
 from .methods import create_transition_predictor
 from .training import base, create_student
 
-
 ATTEMPTS = 5
-
 
 def load_student(run_dir: Path):
     config = json.loads((run_dir / "config.json").read_text())
@@ -30,7 +28,6 @@ def load_student(run_dir: Path):
     student = create_student(config, AutoReplayWrapper(env), sample_level)
     params = serialization.from_bytes(student.params, (run_dir / "checkpoint.msgpack").read_bytes())
     return config, env, student.replace(params=params)
-
 
 def collect(env, student, levels, seed: int, zero_memory: bool) -> dict:
     count = levels.wall_map.shape[0]
@@ -76,7 +73,6 @@ def collect(env, student, levels, seed: int, zero_memory: bool) -> dict:
     _, trajectory = jax.lax.scan(step, initial, None, env.default_params.max_steps_in_episode)
     return jax.device_get(trajectory)
 
-
 def summarize(trajectory: dict, names: list[str]) -> dict:
     dones = np.asarray(trajectory["done"])
     rewards = np.asarray(trajectory["reward"])
@@ -92,7 +88,6 @@ def summarize(trajectory: dict, names: list[str]) -> dict:
         }
         for index, name in enumerate(names)
     }
-
 
 def evaluate(run_dir: Path, output_dir: Path) -> dict:
     config, env, student = load_student(run_dir)
@@ -141,7 +136,6 @@ def evaluate(run_dir: Path, output_dir: Path) -> dict:
     np.savez_compressed(destination / "heldout_rollouts.npz", **arrays)
     return result
 
-
 def write_report(results: list[dict], output: Path) -> None:
     names = results[0]["levels"]
     x = np.arange(len(names))
@@ -172,7 +166,6 @@ table{{border-collapse:collapse}}td,th{{padding:6px 10px;border:1px solid #ddd;t
 <img alt="held-out solve rate by level" src="data:image/png;base64,{base64.b64encode(image.getvalue()).decode()}">
 <table><tr><th>level</th>{headers}</tr>{rows}</table>''')
 
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("output", type=Path)
@@ -180,7 +173,6 @@ def main() -> None:
     args = parser.parse_args()
     results = [evaluate(run, args.output) for run in args.runs]
     write_report(results, args.output / "heldout_comparison.html")
-
 
 if __name__ == "__main__":
     main()

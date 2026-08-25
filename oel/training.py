@@ -20,20 +20,12 @@ import maze_plr as base  # noqa: E402
 from jaxued.environments import Maze  # noqa: E402
 from jaxued.environments.maze import make_level_generator, make_level_mutator_minimax  # noqa: E402
 from jaxued.level_sampler import LevelSampler  # noqa: E402
-from jaxued.utils import accumulate_rollout_stats, compute_max_returns, max_mc, positive_value_loss  # noqa: E402
+from jaxued.utils import accumulate_rollout_stats, compute_max_returns  # noqa: E402
 from jaxued.wrappers import AutoReplayWrapper  # noqa: E402
 
 from .diagnostics import save_json, write_report  # noqa: E402
-from .methods import (  # noqa: E402
-    ResNetPredictor,
-    create_predictor,
-    create_transition_predictor,
-    predict_success,
-    predict_transitions,
-    update_predictor,
-    update_transition_predictor,
-)
-
+from .methods import predict_transitions  # noqa: E402
+from .teacher.runtime import make_ctx, setup_teacher, teacher_step  # noqa: E402
 
 def create_student(config: dict, env, sample_level) -> TrainState:
     rng = jax.random.PRNGKey(config["seed"])
@@ -60,7 +52,6 @@ def create_student(config: dict, env, sample_level) -> TrainState:
         optax.adam(learning_rate, eps=1e-5),
     )
     return TrainState.create(apply_fn=network.apply, params=params, tx=optimizer)
-
 
 def make_train_functions(config: dict, env):
     @jax.jit
@@ -122,7 +113,6 @@ def make_train_functions(config: dict, env):
     ppo_evaluate = jax.jit(lambda rng, student, batch: update(rng, student, batch, False))
     return collect_rollout, ppo_update, ppo_evaluate
 
-
 def make_search(config: dict, eval_env, sample_level):
     batch_size = config["sfl_search_batch_size"]
     attempts = config["sfl_attempts"]
@@ -152,7 +142,6 @@ def make_search(config: dict, eval_env, sample_level):
 
     return search_batch
 
-
 def search_frontier(config: dict, rng, student, search_batch):
     levels, probabilities = [], []
     batches = config["sfl_num_levels"] // config["sfl_search_batch_size"]
@@ -165,7 +154,6 @@ def search_frontier(config: dict, rng, student, search_batch):
     score = probabilities * (1 - probabilities)
     selected = jnp.argsort(score)[-config["sfl_buffer_size"] :]
     return rng, jax.tree_util.tree_map(lambda x: x[selected], levels), probabilities[selected]
-
 
 def make_evaluate(config: dict, eval_env, sample_level):
     levels = jax.vmap(sample_level)(
@@ -197,7 +185,6 @@ def make_evaluate(config: dict, eval_env, sample_level):
         return rng, solved.mean(axis=0), returns.mean(axis=0)
 
     return evaluate
-
 
 def diagnostic_rollout(config: dict, eval_env, sample_level, student) -> dict:
     level_key = jax.random.split(
@@ -269,7 +256,6 @@ def diagnostic_rollout(config: dict, eval_env, sample_level, student) -> dict:
         "zero_memory": run(True),
     }
 
-
 def rebuild_report(run_dir: Path) -> None:
     config = json.loads((run_dir / "config.json").read_text())
     eval_env = Maze(13, 13, agent_view_size=config["agent_view_size"], normalize_obs=True)
@@ -282,7 +268,6 @@ def rebuild_report(run_dir: Path) -> None:
     records = json.loads((run_dir / "metrics.json").read_text())
     events = json.loads((run_dir / "timeline.json").read_text())
     write_report(run_dir, config, records, events, rollout)
-
 
 def run_sfl(config: dict) -> Path:
     if config["sfl_num_levels"] % config["sfl_search_batch_size"]:
@@ -372,7 +357,6 @@ def run_sfl(config: dict) -> Path:
     write_report(run_dir, config, records, events, rollout)
     return run_dir
 
-
 def run_accel(config: dict) -> Path:
     config = dict(config)
     config["device"] = str(jax.devices()[0])
@@ -407,18 +391,7 @@ def run_accel(config: dict) -> Path:
     mutate = jax.jit(lambda key, levels: jax.vmap(mutate_level, (0, 0, None))(
         jax.random.split(key, config["num_train_envs"]), levels, config["num_edits"]
     ))
-    predictor = encode = transition = None
-    if config["score"] in ("fixed", "cnn"):
-        predictor, encode = create_predictor(
-            config["score"], config["seed"], config["predictor_lr"]
-        )
-    elif config["score"] == "resnet":
-        predictor = ResNetPredictor(config["seed"], config["predictor_lr"])
-        config["teacher_device"] = str(predictor.device)
-        save_json(run_dir / "config.json", config)
-        print(json.dumps({"teacher_device": config["teacher_device"]}), flush=True)
-    elif config["score"] in ("traced", "traced_colearn") or config.get("diagnostic_transition"):
-        transition = create_transition_predictor(config["seed"])
+    predictor, encode, transition = setup_teacher(config, run_dir, save_json)
 
     rng = jax.random.PRNGKey(config["seed"])
     records, events = [], []
@@ -451,53 +424,30 @@ def run_accel(config: dict) -> Path:
         rolled_out = time.perf_counter()
         dones, values, advantages = batch[2], batch[4], batch[6]
         max_returns = compute_max_returns(dones, signals["rewards"])
-        method_metrics = {}
-        if config["score"] == "maxmc":
-            if branch == "replay":
-                previous = level_sampler.get_levels_extra(sampler, level_indices)["max_return"]
-                max_returns = jnp.maximum(previous, max_returns)
-            scores = max_mc(dones, values, max_returns)
-            if transition is not None:
-                transition, transition_loss, _, _, _ = update_transition_predictor(
-                    transition, batch[0], batch[1]
-                )
-                method_metrics["transition_loss"] = transition_loss
-        elif transition is not None:
-            pvl = positive_value_loss(dones, advantages)
-            transition, transition_loss, transition_scores, _, _ = update_transition_predictor(
-                transition, batch[0], batch[1]
-            )
-            scores = pvl + config["transition_weight"] * transition_scores
-            mean_regret_diff = jnp.asarray(0.0)
-            if branch == "replay":
-                previous = level_sampler.get_levels_extra(sampler, level_indices)["difficulty"]
-                seen = replayed_before[level_indices]
-                mean_regret_diff = jnp.where(seen, previous - scores, 0).mean()
-            method_metrics = {
-                "transition_loss": transition_loss,
-                "pvl_score": pvl.mean(),
-                "mean_regret_diff": mean_regret_diff,
-                "colearnability_bonus": (
-                    mean_regret_diff if config["score"] == "traced_colearn" else jnp.asarray(0.0)
-                ),
-                "curriculum_score": scores.mean(),
-            }
-        elif config["score"] == "resnet":
-            probability, predictor_loss = predictor.predict_and_update(levels, signals["success"])
-            scores = probability * (1 - probability)
-            method_metrics = {
-                "predicted_success": probability.mean(),
-                "predictor_loss": predictor_loss,
-            }
-        else:
-            inputs = encode(levels)
-            probability = predict_success(predictor, inputs)
-            scores = probability * (1 - probability)
-            predictor, predictor_loss = update_predictor(predictor, inputs, signals["success"])
-            method_metrics = {
-                "predicted_success": probability.mean(),
-                "predictor_loss": predictor_loss,
-            }
+        result = teacher_step(config, make_ctx(
+            config=config,
+            predictor=predictor,
+            encode=encode,
+            transition=transition,
+            levels=levels,
+            signals=signals,
+            dones=dones,
+            values=values,
+            advantages=advantages,
+            batch=batch,
+            branch=branch,
+            sampler=sampler,
+            level_indices=level_indices,
+            level_sampler=level_sampler,
+            replayed_before=replayed_before,
+            max_returns=max_returns,
+        ))
+        scores = result["scores"]
+        method_metrics = result["method_metrics"]
+        predictor = result["predictor"]
+        transition = result["transition"]
+        max_returns = result["max_returns"]
+        mean_regret_diff = result["mean_regret_diff"]
 
         extras = {"max_return": max_returns, "difficulty": scores}
         if branch == "replay":

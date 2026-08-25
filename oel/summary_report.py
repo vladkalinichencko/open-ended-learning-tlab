@@ -11,7 +11,6 @@ import numpy as np
 from .hierarchy import merge_curves, overview_tree
 from .training import ROOT
 
-
 A100 = ROOT / "runs" / "a100_clearml"
 RUNS = [
     ("ACCEL MaxMC", A100 / "ba25cc166eb2498b9a034bccb1d7cffc" / "accel_maxmc_a100_triage_seed0"),
@@ -22,14 +21,12 @@ RUNS = [
 HELDOUT = A100 / "heldout_seed0_5k"
 HIERARCHY = HELDOUT / "accel_maxmc_failure_hierarchy"
 
-
 def image(fig) -> str:
     buffer = io.BytesIO()
     fig.tight_layout()
     fig.savefig(buffer, format="png", dpi=150)
     plt.close(fig)
     return base64.b64encode(buffer.getvalue()).decode()
-
 
 def training_figure(records: dict[str, list[dict]]) -> str:
     fig, axes = plt.subplots(2, 2, figsize=(11, 7))
@@ -50,7 +47,6 @@ def training_figure(records: dict[str, list[dict]]) -> str:
     axes[0, 0].legend(fontsize=8)
     return image(fig)
 
-
 def loss_figure(records: dict[str, list[dict]]) -> str:
     fig, axes = plt.subplots(1, 2, figsize=(11, 4))
     for name, rows in records.items():
@@ -63,7 +59,6 @@ def loss_figure(records: dict[str, list[dict]]) -> str:
         axis.grid(alpha=0.25)
     axes[0].legend(fontsize=8)
     return image(fig)
-
 
 def timing_figure(events: dict[str, list[dict]]) -> str:
     phases = ["search", "rollout", "ppo", "eval"]
@@ -82,7 +77,6 @@ def timing_figure(events: dict[str, list[dict]]) -> str:
     axis.legend(ncol=4)
     return image(fig)
 
-
 def heldout_figure(results: dict[str, dict]) -> str:
     levels = next(iter(results.values()))["levels"]
     x = np.arange(len(levels))
@@ -95,7 +89,6 @@ def heldout_figure(results: dict[str, dict]) -> str:
     axis.tick_params(axis="x", rotation=30)
     axis.legend(fontsize=8)
     return image(fig)
-
 
 def teacher_figure(records: dict[str, list[dict]]) -> str:
     fig, axes = plt.subplots(2, 2, figsize=(11, 7))
@@ -111,7 +104,6 @@ def teacher_figure(records: dict[str, list[dict]]) -> str:
         axis.set(title=title, xlabel="Update")
         axis.grid(alpha=0.25)
     return image(fig)
-
 
 def main() -> None:
     records = {name: json.loads((path / "metrics.json").read_text()) for name, path in RUNS}
@@ -203,7 +195,6 @@ summary{{cursor:pointer;font-weight:600}}code{{background:#f1f1f1;padding:2px 4p
 <p>Эти прогоны не воспроизводят полный бюджет задания, не дают разброс по seeds и не сравниваются с полными DR/PLR baseline. Они показывают, что pipeline работает, CNN-вариант заслуживает полного запуска, а validation-набор нельзя использовать как замену held-out оценке.</p>
 ''')
     print(ROOT / "DIAGNOSTICS.html")
-
 
 if __name__ == "__main__":
     main()

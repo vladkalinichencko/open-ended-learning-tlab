@@ -24,7 +24,6 @@ import levels
 DEV = ["SixteenRooms", "SixteenRooms2", "Labyrinth", "LabyrinthFlipped",
        "Labyrinth2", "StandardMaze", "StandardMaze2", "StandardMaze3"]
 
-
 def replay_weights(sampler, temperature=0.3, staleness_coeff=0.3):
     """Ровно формула jaxued: (1-c)·вес по рангу score + c·вес по устареванию."""
     size = int(sampler["size"])
@@ -36,7 +35,6 @@ def replay_weights(sampler, temperature=0.3, staleness_coeff=0.3):
     stale = np.where(live, int(sampler["episode_count"]) - np.asarray(sampler["timestamps"]), 0.0)
     w_s, w_c = w_s / max(w_s.sum(), 1e-12), stale / max(stale.sum(), 1e-12)
     return live, (1 - staleness_coeff) * w_s + staleness_coeff * w_c
-
 
 def buffer_stats(sampler):
     live, w = replay_weights(sampler)
@@ -58,7 +56,6 @@ def buffer_stats(sampler):
                                    if ok.sum() > 2 and v[ok].std() > 0 else None,
         }
     return out
-
 
 def main():
     p = argparse.ArgumentParser()
@@ -85,7 +82,6 @@ def main():
     path.parent.mkdir(exist_ok=True)
     path.write_text(json.dumps(out, ensure_ascii=False, indent=2))
     print(f"-> {path}")
-
 
 if __name__ == "__main__":
     main()

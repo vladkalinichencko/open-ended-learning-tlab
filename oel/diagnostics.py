@@ -13,10 +13,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 def save_json(path: Path, value) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
-
 
 def _figure(records: list[dict]) -> str:
     steps = np.asarray([row["total_env_steps"] for row in records]) / 1_000_000
@@ -49,7 +47,6 @@ def _figure(records: list[dict]) -> str:
     plt.close(fig)
     return base64.b64encode(out.getvalue()).decode()
 
-
 def _timeline(events: list[dict]) -> str:
     if not events:
         return ""
@@ -78,7 +75,6 @@ def _timeline(events: list[dict]) -> str:
         marks.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="104" y2="108" stroke="#6b7280"/>')
         marks.append(f'<text x="{x:.1f}" y="121" text-anchor="middle" font-size="10">{elapsed / 60:.1f} min</text>')
     return f'<svg viewBox="0 0 940 126" role="img">{"".join(marks)}</svg>'
-
 
 def _parallel_update(events: list[dict], num_envs: int) -> str:
     rollout = next((event for event in reversed(events) if event["phase"] == "rollout"), None)
@@ -111,7 +107,6 @@ def _parallel_update(events: list[dict], num_envs: int) -> str:
     )
     return f'<svg viewBox="0 0 940 66" role="img">{"".join(marks)}</svg>'
 
-
 def _rollout_figure(rollout: dict) -> str:
     fig, axes = plt.subplots(1, 2, figsize=(10, 4.5))
     axes[0].imshow(np.asarray(rollout["wall_map"]), cmap="Greys")
@@ -137,7 +132,6 @@ def _rollout_figure(rollout: dict) -> str:
     plt.close(fig)
     return base64.b64encode(out.getvalue()).decode()
 
-
 def _transition_figure(transition: dict) -> str:
     predictions = np.asarray(transition["predictions"])
     targets = np.asarray(transition["targets"])
@@ -160,7 +154,6 @@ def _transition_figure(transition: dict) -> str:
     fig.savefig(out, format="png", dpi=150)
     plt.close(fig)
     return base64.b64encode(out.getvalue()).decode()
-
 
 def write_report(run_dir: Path, config: dict, records: list[dict], events: list[dict], rollout: dict | None = None) -> None:
     rows = "".join(
@@ -194,7 +187,6 @@ code{{background:#f4f4f4;padding:2px 4px}}</style>
 <h2>Оценки</h2><table><tr><th>update</th><th>training steps</th><th>teacher steps</th><th>total steps</th><th>validation solve</th><th>train solve</th><th>reward</th><th>policy loss</th><th>value loss</th></tr>{rows}</table>
 <p>Исходные значения: <a href="metrics.json">metrics.json</a>. Конфигурация: <a href="config.json">config.json</a>.</p>"""
     (run_dir / "report.html").write_text(html, encoding="utf-8")
-
 
 def write_comparison_report(run_dirs: list[Path], output: Path) -> None:
     runs = []

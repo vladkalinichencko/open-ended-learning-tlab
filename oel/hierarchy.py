@@ -14,14 +14,11 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 
 from .methods import create_transition_predictor
 
-
 LENGTHS = range(10, 81, 10)
 STRIDE = 10
 
-
 def episode_lengths(dones: np.ndarray) -> np.ndarray:
     return np.where(dones.any(axis=0), dones.argmax(axis=0) + 1, len(dones))
-
 
 def windows(data: np.lib.npyio.NpzFile, length: int, level_names: list[str]):
     observations = data["normal_observation"]
@@ -43,7 +40,6 @@ def windows(data: np.lib.npyio.NpzFile, length: int, level_names: list[str]):
             })
     return np.stack(obs, axis=1), np.stack(act, axis=1), metadata
 
-
 def embed(transition, observations: np.ndarray, actions: np.ndarray) -> np.ndarray:
     chunks = []
     for start in range(0, observations.shape[1], 128):
@@ -61,7 +57,6 @@ def embed(transition, observations: np.ndarray, actions: np.ndarray) -> np.ndarr
         raise ValueError("transition embeddings contain non-finite values")
     return embeddings
 
-
 def full_tree(tree: np.ndarray, path: Path) -> None:
     leaves = tree.shape[0] + 1
     fig, axis = plt.subplots(figsize=(max(18, leaves * 0.045), 7))
@@ -77,7 +72,6 @@ def full_tree(tree: np.ndarray, path: Path) -> None:
     fig.tight_layout()
     fig.savefig(path, format="svg")
     plt.close(fig)
-
 
 def overview_tree(tree: np.ndarray) -> str:
     fig, axis = plt.subplots(figsize=(11, 4.5))
@@ -97,7 +91,6 @@ def overview_tree(tree: np.ndarray) -> str:
     plt.close(fig)
     return base64.b64encode(image.getvalue()).decode()
 
-
 def merge_curves(trees: dict[int, np.ndarray]) -> str:
     fig, axis = plt.subplots(figsize=(10, 5.5))
     for length, tree in trees.items():
@@ -111,7 +104,6 @@ def merge_curves(trees: dict[int, np.ndarray]) -> str:
     fig.savefig(image, format="png", dpi=150)
     plt.close(fig)
     return base64.b64encode(image.getvalue()).decode()
-
 
 def build(run_dir: Path, rollout_path: Path, output_dir: Path) -> None:
     config = json.loads((run_dir / "config.json").read_text())
@@ -148,7 +140,6 @@ details{{border-top:1px solid #ddd;padding:12px 0}}summary{{cursor:pointer;font-
 {''.join(sections)}
 <p><a href="contexts.json">Context metadata</a>. <a href="hierarchy.npz">Embeddings and full linkage matrices</a>.</p>''')
 
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("run", type=Path)
@@ -156,7 +147,6 @@ def main() -> None:
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
     build(args.run, args.rollouts, args.output)
-
 
 if __name__ == "__main__":
     main()

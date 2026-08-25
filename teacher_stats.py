@@ -3,7 +3,6 @@
 import jax.numpy as jnp
 from jaxued.utils import accumulate_rollout_stats
 
-
 def success_rate(dones, rewards):
     """Доля эпизодов на уровне, закончившихся достижением цели."""
     solved, _, episodes = accumulate_rollout_stats(dones, (rewards > 0).astype(jnp.float32),

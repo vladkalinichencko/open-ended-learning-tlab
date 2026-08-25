@@ -11,16 +11,22 @@ its buffer, so the two are measured on the same axes.
 """
 
 import collections
+import pathlib
+import sys
 
 import numpy as np
 
+_JAXUED_SRC = pathlib.Path(__file__).parent / "ext/jaxued/src"
+if str(_JAXUED_SRC) not in sys.path:
+    sys.path.insert(0, str(_JAXUED_SRC))
+
+from jaxued.environments.maze.level import Level, prefabs
 
 def neighbours(r, c, walls):
     for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
         rr, cc = r + dr, c + dc
         if 0 <= rr < walls.shape[0] and 0 <= cc < walls.shape[1] and not walls[rr, cc]:
             yield rr, cc
-
 
 def shortest_path(walls, start, goal):
     """BFS: length and the path itself; (-1, []) when the goal is walled off."""
@@ -39,7 +45,6 @@ def shortest_path(walls, start, goal):
                 prev[nxt] = cur
                 q.append(nxt)
     return -1, []
-
 
 def features(walls, agent, goal):
     walls = np.asarray(walls)
@@ -62,16 +67,11 @@ def features(walls, agent, goal):
             "плотность стен": round(float(walls.mean()), 3),
             "длина коридора": longest}
 
-
 def from_prefab(name):
-    import sys, pathlib
-    sys.path.insert(0, str(pathlib.Path(__file__).parent / "ext/jaxued/src"))
-    from jaxued.environments.maze.level import Level, prefabs
     lvl = Level.from_str(prefabs[name])
     return (np.asarray(lvl.wall_map),
             (int(lvl.agent_pos[1]), int(lvl.agent_pos[0])),
             (int(lvl.goal_pos[1]), int(lvl.goal_pos[0])))
-
 
 def from_buffer(sampler, i):
     """i-th level of a restored PLR buffer (checkpoints/<run>/<seed>/models)."""
