@@ -20,14 +20,14 @@ python export_checkpoint.py      # экспорт политики в форма
 
 | из отчёта | в коде |
 |---|---|
-| MaxMC, приближение сожаления | `scores/maxmc.py` |
-| ошибка предсказания ценности | `scores/pvl.py` |
+| MaxMC, приближение регрета | `scores/maxmc.py` |
+| ошибка предсказания value | `scores/pvl.py` |
 | обучаемость $q(1-q)$ | `scores/learnability.py` |
 | learnability × PVL | `scores/learnability_pvl.py` |
 | диспетчер score для `teacher.py` / `sfl.py` | `scores/__init__.py` |
 | предикторы: признаки, свёртка, ResNet | `oel/methods.py` |
 | teacher score на шаге ACCEL | `oel/teacher/` |
-| обучение ученика и цикл учителя | `oel/training.py` |
+| обучение студента и цикл учителя | `oel/training.py` |
 | оценка на отложенных картах | `oel/evaluate_heldout.py` |
 | кластеризация неудач | `oel/hierarchy.py`, `oel/diagnostics.py` |
 | сборка страницы диагностики | `oel/summary_report.py` |
